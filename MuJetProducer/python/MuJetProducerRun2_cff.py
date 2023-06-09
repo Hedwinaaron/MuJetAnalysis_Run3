@@ -1,5 +1,5 @@
 import FWCore.ParameterSet.Config as cms
-from MuJetAnalysis.MuJetProducer.MuJetProducerRun2_cfi import *
+from MuJetAnalysis_Run3.MuJetProducer.MuJetProducerRun2_cfi import *
 
 PFMuJetProducer05PXBL4PXFL3 = MuJetProducer.clone(
     maxMass = cms.double(60.),

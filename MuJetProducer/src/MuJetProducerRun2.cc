@@ -24,7 +24,7 @@ Implementation:
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "MuJetAnalysis/DataFormats/interface/MultiMuon.h"
+#include "MuJetAnalysis_Run3/DataFormats/interface/MultiMuon.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
@@ -705,7 +705,7 @@ void MuJetProducerRun2::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
   std::unique_ptr<pat::MultiMuonCollection> EquivalenceClasses(new pat::MultiMuonCollection);
   std::cout<<"line "<< __LINE__ << "FinalJets # " << FinalJets.size()<<std::endl;
   if (FinalJets.size() != 0){
-  std::cout<<"line "<< __LINE__<<"  FinalJets muo 1 ptr  "<<  FinalJets.at(0).muon(0)<<"  FinalJets muon 1 source ptr  "<< FinalJets.at(0).muon(0)->sourceCandidatePtr(0).get()<<std::endl;
+  std::cout<<"line "<< __LINE__<<"  FinalJets muo 1 ptr  "<<  FinalJets.at(0).muon(0)<<"  FinalJets muon 1 source ptr  "<< FinalJets.at(0).muon(0)->sourceCandidatePtr(1).get()<<std::endl;
   for (unsigned int i = 0;  i < FinalJets.size();  i++) {
     EquivalenceClasses->push_back(FinalJets[i]);
   }

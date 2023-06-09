@@ -18,7 +18,7 @@
 */
 
 #include "DataFormats/PatCandidates/interface/CompositeCandidate.h"
-#include "MuJetAnalysis/DataFormats/interface/MultiMuon.h"
+#include "MuJetAnalysis_Run3/DataFormats/interface/MultiMuon.h"
 
 // Define typedefs for convenience
 namespace pat {

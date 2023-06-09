@@ -2,7 +2,7 @@
 #define MuJetAnalysis_DataFormats_MultiElectron_h
 
 #include "DataFormats/PatCandidates/interface/Electron.h"
-#include "MuJetAnalysis/DataFormats/interface/MultiLepton.h"
+#include "MuJetAnalysis_Run3/DataFormats/interface/MultiLepton.h"
 
 class TransientTrackBuilder;
 

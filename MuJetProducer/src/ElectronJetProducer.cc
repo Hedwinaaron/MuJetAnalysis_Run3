@@ -8,7 +8,7 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "MuJetAnalysis/DataFormats/interface/MultiElectron.h"
+#include "MuJetAnalysis_Run3/DataFormats/interface/MultiElectron.h"
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 //#include "DataFormats/MuonReco/interface/MuonSelectors.h"

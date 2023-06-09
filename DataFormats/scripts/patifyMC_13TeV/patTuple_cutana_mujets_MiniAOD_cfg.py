@@ -26,8 +26,8 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 #process.load("MuJetAnalysis.DataFormats.miniAODtoPAT_cff")
 process.load("PhysicsTools.PatAlgos.slimming.unpackedTracksAndVertices_cfi")
 #process.load("MuJetAnalysis.MuJetProducer.MuJetProducer_MiniAOD_cff")#Pre-Run2 mu-jet cluster
-process.load("MuJetAnalysis.MuJetProducer.MuJetProducerRun2_cff")#Run2 mu-jet cluster
-process.load("MuJetAnalysis.CutFlowAnalyzer.CutFlowAnalyzer_MiniAOD_Run3_cff")
+process.load("MuJetAnalysis_Run3.MuJetProducer.MuJetProducerRun2_cff")#Run2 mu-jet cluster
+process.load("MuJetAnalysis_Run3.CutFlowAnalyzer.CutFlowAnalyzer_MiniAOD_Run3_cff")
 
 process.source = cms.Source(
     "PoolSource",

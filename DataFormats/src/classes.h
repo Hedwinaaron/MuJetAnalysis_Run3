@@ -1,6 +1,6 @@
-#include "MuJetAnalysis/DataFormats/interface/MultiElectron.h"
-#include "MuJetAnalysis/DataFormats/interface/MultiMuon.h"
-#include "MuJetAnalysis/DataFormats/interface/HAA4MuCandidate.h"
+#include "MuJetAnalysis_Run3/DataFormats/interface/MultiElectron.h"
+#include "MuJetAnalysis_Run3/DataFormats/interface/MultiMuon.h"
+#include "MuJetAnalysis_Run3/DataFormats/interface/HAA4MuCandidate.h"
 #include <vector>
 
 namespace {

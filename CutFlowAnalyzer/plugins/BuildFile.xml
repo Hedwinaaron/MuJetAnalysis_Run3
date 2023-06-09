@@ -24,8 +24,8 @@
 <use   name="TrackingTools/Records"/>
 <use   name="TrackingTools/TrackFitters"/>
 <use   name="TrackingTools/TrajectoryState"/>
-<use   name="MuJetAnalysis/DataFormats"/>
-<use   name="MuJetAnalysis/AnalysisTools"/>
+<use   name="MuJetAnalysis_Run3/DataFormats"/>
+<use   name="MuJetAnalysis_Run3/AnalysisTools"/>
 <use   name="PhysicsTools/RecoUtils"/>
 <use   name="RecoTracker/MeasurementDet"/>
 <use   name="RecoTracker/TransientTrackingRecHit"/>

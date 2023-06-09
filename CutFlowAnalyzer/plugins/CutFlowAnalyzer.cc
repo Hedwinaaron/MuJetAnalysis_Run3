@@ -26,10 +26,10 @@
 #include "RecoTracker/MeasurementDet/interface/MeasurementTrackerEvent.h"
 #include "TrackingTools/PatternTools/interface/Trajectory.h"
 
-#include "MuJetAnalysis/DataFormats/interface/MultiMuon.h"
+#include "MuJetAnalysis_Run3/DataFormats/interface/MultiMuon.h"
 //#include "MuJetAnalysis/AnalysisTools/interface/ConsistentVertexesCalculator.h"
 //#include "MuJetAnalysis/AnalysisTools/interface/DisplacedVertexFinder.h"
-#include "MuJetAnalysis/AnalysisTools/interface/Helpers.h"
+#include "MuJetAnalysis_Run3/AnalysisTools/interface/Helpers.h"
 
 // user include files
 #include "TTree.h"

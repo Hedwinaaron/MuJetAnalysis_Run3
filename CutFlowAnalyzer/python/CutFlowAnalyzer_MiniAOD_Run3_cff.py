@@ -1,5 +1,5 @@
 import FWCore.ParameterSet.Config as cms
-from MuJetAnalysis.CutFlowAnalyzer.CutFlowAnalyzer_MiniAOD_Run3_cfi import *
+from MuJetAnalysis_Run3.CutFlowAnalyzer.CutFlowAnalyzer_MiniAOD_Run3_cfi import *
 
 cutFlowAnalyzerPXBL4PXFL3 = cutFlowAnalyzer.clone(
     barrelPixelLayer = cms.int32(4),

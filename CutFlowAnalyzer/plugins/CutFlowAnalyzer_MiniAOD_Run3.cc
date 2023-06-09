@@ -32,8 +32,8 @@
 #include "RecoTracker/MeasurementDet/interface/MeasurementTrackerEvent.h"
 #include "TrackingTools/PatternTools/interface/Trajectory.h"
 
-#include "MuJetAnalysis/DataFormats/interface/MultiMuon.h"
-#include "MuJetAnalysis/AnalysisTools/interface/Helpers.h"
+#include "MuJetAnalysis_Run3/DataFormats/interface/MultiMuon.h"
+#include "MuJetAnalysis_Run3/AnalysisTools/interface/Helpers.h"
 
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
@@ -48,14 +48,14 @@
 //                           Class declaration
 //******************************************************************************
 
-class CutFlowAnalyzer_MiniAOD : public edm::one::EDAnalyzer<edm::one::WatchRuns>{
+class CutFlowAnalyzer_MiniAOD_Run3 : public edm::one::EDAnalyzer<edm::one::WatchRuns>{
 private:
   HLTPrescaleProvider hltPSProv_;
   std::string hltProcess_; //name of HLT process, usually "HLT"
 
 public:
-  explicit CutFlowAnalyzer_MiniAOD(const edm::ParameterSet&);
-  ~CutFlowAnalyzer_MiniAOD();
+  explicit CutFlowAnalyzer_MiniAOD_Run3(const edm::ParameterSet&);
+  ~CutFlowAnalyzer_MiniAOD_Run3();
 
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
   void FillTrigInfo( TH1F *h1, const edm::TriggerNames&, std::map<int,std::string> nameAndNumb );
@@ -623,7 +623,7 @@ private:
   Int_t m_orphan_matched_segs_Mu1;
 };
 
-CutFlowAnalyzer_MiniAOD::CutFlowAnalyzer_MiniAOD(const edm::ParameterSet& iConfig):
+CutFlowAnalyzer_MiniAOD_Run3::CutFlowAnalyzer_MiniAOD_Run3(const edm::ParameterSet& iConfig):
 //Add for accessing L1 decision   @Wei SHI, Mar 11, 2019
 hltPSProv_(iConfig.getParameter<edm::ParameterSet>("hltPSProvCfg"),consumesCollector(),*this),//it needs a referernce to the calling module for some reason, hence the *this
 hltProcess_(iConfig.getParameter<std::string>("hltProcess"))
@@ -702,7 +702,7 @@ hltProcess_(iConfig.getParameter<std::string>("hltProcess"))
 }
 
 
-CutFlowAnalyzer_MiniAOD::~CutFlowAnalyzer_MiniAOD()
+CutFlowAnalyzer_MiniAOD_Run3::~CutFlowAnalyzer_MiniAOD_Run3()
 {
   if (m_events==0) return;
   triggerComposition->Write();
@@ -719,7 +719,7 @@ CutFlowAnalyzer_MiniAOD::~CutFlowAnalyzer_MiniAOD()
 // member functions
 //
 // ------------ method called when starting to processes a run  ------------
-void CutFlowAnalyzer_MiniAOD::beginRun(const edm::Run& run,const edm::EventSetup& setup)
+void CutFlowAnalyzer_MiniAOD_Run3::beginRun(const edm::Run& run,const edm::EventSetup& setup)
 {
   //Added for L1 decision @Wei SHI, Mar 11, 2019
   //Need to initalise the menu each run (menu can and will change on run boundaries)
@@ -731,7 +731,7 @@ void CutFlowAnalyzer_MiniAOD::beginRun(const edm::Run& run,const edm::EventSetup
 }
 
 // ------------ method called for each event  ------------
-void CutFlowAnalyzer_MiniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   m_fillGenLevel = !iEvent.eventAuxiliary().isRealData();
 
@@ -2698,7 +2698,7 @@ void CutFlowAnalyzer_MiniAOD::analyze(const edm::Event& iEvent, const edm::Event
 
 // ------------ method called once each job just before starting event loop  ------------
 void
-CutFlowAnalyzer_MiniAOD::beginJob() {
+CutFlowAnalyzer_MiniAOD_Run3::beginJob() {
   std::cout << "BEGIN JOB" << std::endl;
   edm::Service<TFileService> tFileService;
 
@@ -3169,13 +3169,13 @@ CutFlowAnalyzer_MiniAOD::beginJob() {
 
 // ------------ method called once each job just after ending the event loop  ------------
 void
-CutFlowAnalyzer_MiniAOD::endJob()
+CutFlowAnalyzer_MiniAOD_Run3::endJob()
 {
   using namespace std;
   cout << "END JOB" << endl;
 }
 
-void CutFlowAnalyzer_MiniAOD::FillTrigInfo( TH1F * h1, const edm::TriggerNames& triggerNames, std::map<int,std::string> nameAndNumb )
+void CutFlowAnalyzer_MiniAOD_Run3::FillTrigInfo( TH1F * h1, const edm::TriggerNames& triggerNames, std::map<int,std::string> nameAndNumb )
 {
   for( unsigned int i=0; i<nameAndNumb.size(); i++ ){
     for (unsigned int itrig = 0; itrig != triggerNames.size(); ++itrig) {
@@ -3189,7 +3189,7 @@ void CutFlowAnalyzer_MiniAOD::FillTrigInfo( TH1F * h1, const edm::TriggerNames& 
 }
 
 // ------------ method called when ending the processing of a run  ------------
-void CutFlowAnalyzer_MiniAOD::endRun(edm::Run const&, edm::EventSetup const&)
+void CutFlowAnalyzer_MiniAOD_Run3::endRun(edm::Run const&, edm::EventSetup const&)
 {
 }
 
@@ -3207,7 +3207,7 @@ void CutFlowAnalyzer_MiniAOD::endLuminosityBlock(edm::LuminosityBlock const&, ed
 */
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
-void CutFlowAnalyzer_MiniAOD::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+void CutFlowAnalyzer_MiniAOD_Run3::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
@@ -3216,4 +3216,4 @@ void CutFlowAnalyzer_MiniAOD::fillDescriptions(edm::ConfigurationDescriptions& d
 }
 //Indentation change
 //define this as a plug-in
-DEFINE_FWK_MODULE(CutFlowAnalyzer_MiniAOD);
+DEFINE_FWK_MODULE(CutFlowAnalyzer_MiniAOD_Run3);

@@ -4,7 +4,7 @@
 // Jim Pivarski <pivarski@physics.tamu.edu>
 // 
 
-#include "MuJetAnalysis/DataFormats/interface/HAA4MuCandidate.h"
+#include "MuJetAnalysis_Run3/DataFormats/interface/HAA4MuCandidate.h"
 
 /// default constructor
 pat::HAA4MuCandidate::HAA4MuCandidate(const pat::MultiMuon *axialHiggs0, const pat::MultiMuon *axialHiggs1) {

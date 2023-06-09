@@ -4,7 +4,7 @@
 // Jim Pivarski <pivarski@physics.tamu.edu>
 //
 
-#include "MuJetAnalysis/DataFormats/interface/MultiMuon.h"
+#include "MuJetAnalysis_Run3/DataFormats/interface/MultiMuon.h"
 
 #ifndef MULTIMUONCANDIDATE_FOR_FWLITE
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
@@ -13,7 +13,7 @@
 #include "RecoVertex/VertexTools/interface/SequentialVertexFitter.h"
 #include "TrackingTools/PatternTools/interface/ClosestApproachInRPhi.h"
 #include "TrackingTools/PatternTools/interface/TwoTrackMinimumDistance.h"
-#include "MuJetAnalysis/AnalysisTools/interface/Helpers.h"
+#include "MuJetAnalysis_Run3/AnalysisTools/interface/Helpers.h"
 
 #include "TLorentzVector.h"
 

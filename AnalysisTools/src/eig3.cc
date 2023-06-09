@@ -6,7 +6,7 @@
 #define _eig_cc
 
 #include <math.h>
-#include "MuJetAnalysis/AnalysisTools/interface/eig3.h"
+#include "MuJetAnalysis_Run3/AnalysisTools/interface/eig3.h"
 
 #ifdef MAX
 #undef MAX
