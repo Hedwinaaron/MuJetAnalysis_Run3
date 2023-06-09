@@ -31,7 +31,7 @@ process.load("MuJetAnalysis.CutFlowAnalyzer.CutFlowAnalyzer_MiniAOD_Run3_cff")
 
 process.source = cms.Source(
     "PoolSource",
-    fileNames = cms.untracked.vstring('file:/afs/cern.ch/user/h/hencinas/public/Run3-sample/0f9315cb-fa46-4540-87ed-b29a3f687512.root',
+    fileNames = cms.untracked.vstring('file:/eos/user/h/hencinas/Dark_photo_sample_analysis/CMSSW_12_4_11_patch3/src/13p6Tev_samples/DarkSUSY_mH_125_mN1_10_mND_1_mGammaD_0p25_13p6TeV_cT_0p1_events10k_MINIAOD.root',
     )
 )
 

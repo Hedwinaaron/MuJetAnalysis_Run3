@@ -26,7 +26,6 @@
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
-#include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "PhysicsTools/RecoUtils/interface/CheckHitPattern.h"
@@ -49,14 +48,14 @@
 //                           Class declaration
 //******************************************************************************
 
-class CutFlowAnalyzer_MiniAOD_Run3 : public edm::one::EDAnalyzer<edm::one::WatchRuns>{
+class CutFlowAnalyzer_MiniAOD : public edm::one::EDAnalyzer<edm::one::WatchRuns>{
 private:
   HLTPrescaleProvider hltPSProv_;
   std::string hltProcess_; //name of HLT process, usually "HLT"
 
 public:
-  explicit CutFlowAnalyzer_MiniAOD_Run3(const edm::ParameterSet&);
-  ~CutFlowAnalyzer_MiniAOD_Run3();
+  explicit CutFlowAnalyzer_MiniAOD(const edm::ParameterSet&);
+  ~CutFlowAnalyzer_MiniAOD();
 
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
   void FillTrigInfo( TH1F *h1, const edm::TriggerNames&, std::map<int,std::string> nameAndNumb );
@@ -578,10 +577,53 @@ private:
   Float_t b_PAT_jet_CSVv2[100];
 
   //For Control Region Events
+  Bool_t  m_orphan_passOffLineSel;
+  Bool_t  m_orphan_passOffLineSelPtEta;
 
+  Int_t m_orphan_dimu_nSAMu;
+  Int_t m_orphan_dimu_nNonTrackerMu;
+  Int_t m_orphan_nSAMu;
+  Int_t m_orphan_nNonTrackerMu;
+  Int_t m_orphan_dimu_Mu0_hitpix_Phase1;
+  Int_t m_orphan_dimu_Mu1_hitpix_Phase1;
+  Int_t m_orphan_dimu_Mu0_ValidPixelHits;
+  Int_t m_orphan_dimu_Mu1_ValidPixelHits;
+  Int_t m_orphan_dimu_Mu0_ValidPixelBarrelHits;
+  Int_t m_orphan_dimu_Mu1_ValidPixelBarrelHits;
+  Int_t m_orphan_dimu_Mu0_ValidPixelEndcapHits;
+  Int_t m_orphan_dimu_Mu1_ValidPixelEndcapHits;
+  Int_t m_orphan_dimu_Mu0_pixelLayersWithMeasurement;
+  Int_t m_orphan_dimu_Mu1_pixelLayersWithMeasurement;
+
+  Float_t m_orphan_dimu_dR;
+  Float_t m_orphan_dimu_mass;
+  Float_t m_orphan_dimu_z;
+  Float_t m_orphan_dimu_Lxy;
+  Float_t m_orphan_dimu_L;
+  Float_t m_orphan_dimu_chi2;
+  Float_t m_orphan_dimu_ndof;
+  Float_t m_orphan_dimu_prob;
+  Float_t m_orphan_dimu_isoTk;
+  Float_t m_orphan_dimu_Mu0_isoTk0p3;
+  Float_t m_orphan_dimu_Mu0_isoTk0p4;
+  Float_t m_orphan_dimu_Mu0_isoTk0p5;
+  Float_t m_orphan_dimu_Mu1_isoTk0p3;
+  Float_t m_orphan_dimu_Mu1_isoTk0p4;
+  Float_t m_orphan_dimu_Mu1_isoTk0p5;
+  Float_t m_orphan_isoTk;
+
+  Float_t m_orphan_PtOrph;
+  Float_t m_orphan_EtaOrph;
+  Int_t m_orphan_matched_segs_Orph;
+  Float_t m_orphan_PtMu0;
+  Float_t m_orphan_EtaMu0;
+  Int_t m_orphan_matched_segs_Mu0;
+  Float_t m_orphan_PtMu1;
+  Float_t m_orphan_EtaMu1;
+  Int_t m_orphan_matched_segs_Mu1;
 };
 
-CutFlowAnalyzer_MiniAOD_Run3::CutFlowAnalyzer_MiniAOD_Run3(const edm::ParameterSet& iConfig):
+CutFlowAnalyzer_MiniAOD::CutFlowAnalyzer_MiniAOD(const edm::ParameterSet& iConfig):
 //Add for accessing L1 decision   @Wei SHI, Mar 11, 2019
 hltPSProv_(iConfig.getParameter<edm::ParameterSet>("hltPSProvCfg"),consumesCollector(),*this),//it needs a referernce to the calling module for some reason, hence the *this
 hltProcess_(iConfig.getParameter<std::string>("hltProcess"))
@@ -660,7 +702,7 @@ hltProcess_(iConfig.getParameter<std::string>("hltProcess"))
 }
 
 
-CutFlowAnalyzer_MiniAOD_Run3::~CutFlowAnalyzer_MiniAOD_Run3()
+CutFlowAnalyzer_MiniAOD::~CutFlowAnalyzer_MiniAOD()
 {
   if (m_events==0) return;
   triggerComposition->Write();
@@ -677,9 +719,8 @@ CutFlowAnalyzer_MiniAOD_Run3::~CutFlowAnalyzer_MiniAOD_Run3()
 // member functions
 //
 // ------------ method called when starting to processes a run  ------------
-void CutFlowAnalyzer_MiniAOD_Run3::beginRun(const edm::Run& run,const edm::EventSetup& setup)
+void CutFlowAnalyzer_MiniAOD::beginRun(const edm::Run& run,const edm::EventSetup& setup)
 {
-std::cout<<"____________________Begin CutFlowAnalyzer____________________"<<std::endl;
   //Added for L1 decision @Wei SHI, Mar 11, 2019
   //Need to initalise the menu each run (menu can and will change on run boundaries)
   bool changed=false;
@@ -690,7 +731,7 @@ std::cout<<"____________________Begin CutFlowAnalyzer____________________"<<std:
 }
 
 // ------------ method called for each event  ------------
-void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+void CutFlowAnalyzer_MiniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   m_fillGenLevel = !iEvent.eventAuxiliary().isRealData();
 
@@ -753,7 +794,7 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
   //****************************************************************************
   //                          GEN LEVEL ANALYSIS START
   //****************************************************************************
-  std::cout<<"line "<< __LINE__<<" GEN LEVEL ANALYSIS START OK " << std::endl;
+  std::cout << " GEN LEVEL ANALYSIS START OK " << std::endl;
   if (m_fillGenLevel){
 
     if ( m_debug > 0 ) std::cout << m_events << " Start GEN Level" << std::endl;
@@ -1245,7 +1286,7 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
   //****************************************************************************
   //                          RECO LEVEL ANALYSIS START
   //****************************************************************************
-  std::cout <<"line "<< __LINE__<< " RECO LEVEL ANALYSIS START OK " << std::endl;
+  std::cout << " RECO LEVEL ANALYSIS START OK " << std::endl;
   if ( m_debug > 0 ) std::cout << m_events << " Start RECO Level" << std::endl;
 
   edm::Handle<pat::MuonCollection> muons;
@@ -1292,7 +1333,7 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
       selMuons.push_back( &(*iMuon) );
     }
   }
-  std::cout<<"line "<< __LINE__ << " RECO LEVEL ANALYSIS START OK 2" << std::endl;
+  std::cout << " RECO LEVEL ANALYSIS START OK 2" << std::endl;
   // Sort selMuons by pT (leading pT first)
   if ( selMuons.size() > 1 ) std::sort( selMuons.begin(), selMuons.end(), tamu::helpers::PtOrderRecoMu );
   b_nRecoMu = selMuons.size();
@@ -1389,7 +1430,7 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
         selMuonsLowPt.push_back(selMuons[i]);
       }
   }
-  std::cout<<"line "<< __LINE__ << " RECO LEVEL ANALYSIS START OK 2 " << std::endl;
+  std::cout << " RECO LEVEL ANALYSIS START OK 2 " << std::endl;
   //Event selectors @RECO level
   b_is1SelMuHighPt = false;
   b_is2SelMuHighPt = false;
@@ -1445,7 +1486,7 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
     b_nDaughterPerMuJet = b_nDaughterPerMuJet / b_nMuJets;
     if ( m_debug > 0 ) std::cout << "Avg. No. of Daughter per Mu Jet: " << b_nDaughterPerMuJet << std::endl;
   }
-  std::cout <<"line "<< __LINE__<< " RECO LEVEL ANALYSIS START OK 3" << std::endl;
+  std::cout << " RECO LEVEL ANALYSIS START OK 3" << std::endl;
   //int nMuJetsContainMuHighPt = 0;
   //Here need to make sure 2 dimu (or: mujet, interchangable) have 2 high pt mu to fire trigger L2Mu23
   //Because when pairing muons in MuJetProducerRun2.cc, we only required pT>8 and |eta|<2.4 for all muons
@@ -1485,7 +1526,7 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
   }
 
   if ( m_debug > 0 ) std::cout << m_events << " Check if exactly 2 muon jets are built" << std::endl;
-  std::cout <<"line "<< __LINE__<< " RECO LEVEL ANALYSIS START OK 4" << std::endl;
+  std::cout << " RECO LEVEL ANALYSIS START OK 4" << std::endl;
   //Note@Wei, May 20, 2020: Below count SA muons is not ideal, as muJetC and muJetF are registered together when mujet size is two,
   //so you only get correct count nSA when there are two mujets.
   //In a way this is what we preferred now because we are more concerned how many SA muons are in the final dimu, not the sel mu
@@ -1542,7 +1583,7 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
       b_dimuF_nNonTrackerMu++;
     }
   }
-  std::cout<<"line "<< __LINE__ << " RECO LEVEL ANALYSIS START OK 5" << std::endl;
+  std::cout << " RECO LEVEL ANALYSIS START OK 5" << std::endl;
   b_is2DiMuons = false;
   const pat::MultiMuon *diMuonC = NULL;
   const pat::MultiMuon *diMuonF = NULL;
@@ -1618,7 +1659,7 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
     b_muJetF_Mu0_matched_segs = -1;
     b_muJetF_Mu1_matched_segs = -1;
   }
-  std::cout<<"line "<< __LINE__ << " RECO LEVEL ANALYSIS START OK 6" << std::endl;
+  std::cout << " RECO LEVEL ANALYSIS START OK 6" << std::endl;
   //Now we have two distinct dimuons, we do a sanity check to reject rare events
   //where DY muons come with additional muons from FSR/ISR photon,
   //which could radiate from: (I) protons; (II) DY muons
@@ -1666,7 +1707,7 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
       b_dPhiRePairedDimuA = tamu::helpers::My_dPhi( b_muJetC_Mu0_phi, b_muJetF_Mu1_phi );
       b_dPhiRePairedDimuB = tamu::helpers::My_dPhi( b_muJetC_Mu1_phi, b_muJetF_Mu0_phi );
     }
-  std::cout<<"line "<< __LINE__ << " RECO LEVEL ANALYSIS START OK 7" << std::endl;
+  std::cout << " RECO LEVEL ANALYSIS START OK 7" << std::endl;
     //re-paired mass order
     if(b_recoFakeDiMu0_m >= b_recoFakeDiMu1_m){
       b_recoRePaired2muleading_m = b_recoFakeDiMu0_m;
@@ -1714,7 +1755,7 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
     b_recoRePaired2muleading_dR = -999.;
     b_recoRePaired2mutrailing_dR = -999.;
   }
-  std::cout<<"line "<< __LINE__ << " RECO LEVEL ANALYSIS START OK 8" << std::endl;
+  std::cout << " RECO LEVEL ANALYSIS START OK 8" << std::endl;
   // Variables calculated with fitted vertexes
   if ( diMuonC != NULL ) b_diMuonC_FittedVtx_dR = diMuonC->dR(0, 1, diMuonC->vertexValid());
   else b_diMuonC_FittedVtx_dR = -1000.0;
@@ -1766,7 +1807,7 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
   else b_diMuonF_FittedVtx_dR = -1000.0;
 
   if ( diMuonF != NULL && diMuonF->vertexValid() ) {
-    std::cout <<"line "<< __LINE__<< " RECO LEVEL ANALYSIS START OK 9" << std::endl;
+    std::cout << " RECO LEVEL ANALYSIS START OK 9" << std::endl;
     b_diMuonF_FittedVtx_m   = diMuonF->vertexMass();//seems ok
     //variables below are relevant when calculate dimu iso
     b_diMuonF_FittedVtx_px  = diMuonF->vertexMomentum().x();
@@ -1802,7 +1843,7 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
     b_diMuonF_FittedVtx_ndof= -1000.0;
     b_diMuonF_FittedVtx_prob= -1000.0;
   }
-  std::cout <<"line "<< __LINE__<< " RECO LEVEL ANALYSIS START OK 10" << std::endl;
+  std::cout << " RECO LEVEL ANALYSIS START OK 10" << std::endl;
   // fitted vertexes
   b_is2DiMuonsFittedVtxOK = false;
   if ( diMuonC != NULL && diMuonF != NULL ) {
@@ -1906,7 +1947,7 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
 
     }//end trRes accept
   }//end for trig
-  std::cout <<"line "<< __LINE__<< " RECO LEVEL ANALYSIS START OK 11" << std::endl;
+  std::cout << " RECO LEVEL ANALYSIS START OK 11" << std::endl;
   if ( m_debug > 0 )  std::cout << m_events << " Apply cut on HLT" << std::endl;
 
   //get L1 decisions for signal HLT L1 seeds
@@ -1941,7 +1982,7 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
   if(psColumn==0 && iEvent.isRealData()){
     std::cout <<"PS column zero detected for data, this is unlikely (almost all triggers are disabled in normal menus here) and its more likely that you've not loaded the correct global tag in "<<std::endl;
   }
-  std::cout<<"line "<< __LINE__ << " RECO LEVEL ANALYSIS START OK 12" << std::endl;
+  std::cout << " RECO LEVEL ANALYSIS START OK 12" << std::endl;
   //note to the reader, what I'm doing is extremely dangerious (a const cast), never do this!
   //however in this narrow case, it fixes a bug in l1t::L1TGlobalUtil (the method should be const)
   //and it is safe for this specific instance
@@ -1961,7 +2002,7 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
     }//end loop over L1 seeds in signal HLT
     if ( m_debug > 10 ) std::cout <<"   "<<bitNr<<" "<<bitName<<" "<<passInitial<<" "<<passInterm<<" "<<passFinal<<" "<<prescale<<std::endl;
   }
-  std::cout<<"line "<< __LINE__ << " RECO LEVEL ANALYSIS START OK 13" << std::endl;
+  std::cout << " RECO LEVEL ANALYSIS START OK 13" << std::endl;
   // Cut on dimuon masses - use fitted vertexes
   //* Run2 (2017+2018): Poly-2 Fit from 2017 ALP signal samples (currently adopted below):
   b_is2DiMuonsMassOK_FittedVtx = false;
@@ -1995,8 +2036,7 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
   b_diMuonFMu1_IsoTk0p5_FittedVtx = -999.;
 
   if ( diMuonC != NULL && diMuonC->vertexValid() ) {
-    std::cout<<"line "<< __LINE__ << " RECO LEVEL ANALYSIS START OK 13.1"<< std::endl;
-    std::cout<<"line "<< __LINE__ <<"dimuonc muon 1 Source ptr=  "<<diMuonC->muon(0)->sourceCandidatePtr(0).get()<<"  dimuonc muon 1 ptr=  "<<diMuonC->muon(0)<< std::endl;
+
     double diMuonC_IsoTk_FittedVtx = -999.;
     double diMuonCMu0_IsoTk0p3_FittedVtx = -999.;
     double diMuonCMu0_IsoTk0p4_FittedVtx = -999.;
@@ -2004,10 +2044,10 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
     double diMuonCMu1_IsoTk0p3_FittedVtx = -999.;
     double diMuonCMu1_IsoTk0p4_FittedVtx = -999.;
     double diMuonCMu1_IsoTk0p5_FittedVtx = -999.;
-    std::cout<<"line "<< __LINE__ << " RECO LEVEL ANALYSIS START OK 14" << std::endl;
-    const pat::PackedCandidate* candFittedVtx_diMuonCMu0 = dynamic_cast<const pat::PackedCandidate*>(diMuonC->muon(0)->sourceCandidatePtr(0).get());
-    const pat::PackedCandidate* candFittedVtx_diMuonCMu1 = dynamic_cast<const pat::PackedCandidate*>(diMuonC->muon(1)->sourceCandidatePtr(0).get());
 
+    const pat::PackedCandidate* candFittedVtx_diMuonCMu0 = dynamic_cast<const pat::PackedCandidate*>(diMuonC->muon(0)->sourceCandidatePtr(1).get());
+    const pat::PackedCandidate* candFittedVtx_diMuonCMu1 = dynamic_cast<const pat::PackedCandidate*>(diMuonC->muon(1)->sourceCandidatePtr(1).get());
+  std::cout << " RECO LEVEL ANALYSIS START OK 14" << std::endl;
     //Avoid null dynamic cast: casuing segmentation violation error
     //In cases no dynamic cast exists, the event shouldn't be considered
     //since the track couldn't be matched to the muons in the dimuon, this will lead to wrong iso.
@@ -2029,8 +2069,8 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
           if ( tamu::helpers::sameTrack( &*track, &(candFittedVtx_diMuonCMu0->pseudoTrack()) ) || tamu::helpers::sameTrack( &*track, &(candFittedVtx_diMuonCMu1->pseudoTrack()) ) ) trackIsMuon = true;
           //If the other dimu exists, also exclude its signal muons
           if ( diMuonF != NULL && diMuonF->vertexValid() ) {
-            const pat::PackedCandidate* candTmp_diMuonFMu0 = dynamic_cast<const pat::PackedCandidate*>(diMuonF->muon(0)->sourceCandidatePtr(0).get());
-            const pat::PackedCandidate* candTmp_diMuonFMu1 = dynamic_cast<const pat::PackedCandidate*>(diMuonF->muon(1)->sourceCandidatePtr(0).get());
+            const pat::PackedCandidate* candTmp_diMuonFMu0 = dynamic_cast<const pat::PackedCandidate*>(diMuonF->muon(0)->sourceCandidatePtr(1).get());
+            const pat::PackedCandidate* candTmp_diMuonFMu1 = dynamic_cast<const pat::PackedCandidate*>(diMuonF->muon(1)->sourceCandidatePtr(1).get());
             if ( candTmp_diMuonFMu0!=0 && candTmp_diMuonFMu1!=0 && candTmp_diMuonFMu0->hasTrackDetails() && candTmp_diMuonFMu1->hasTrackDetails() ){
               if ( tamu::helpers::sameTrack( &*track, &(candTmp_diMuonFMu0->pseudoTrack()) ) || tamu::helpers::sameTrack( &*track, &(candTmp_diMuonFMu1->pseudoTrack()) ) ) trackIsMuon = true;
             }
@@ -2067,7 +2107,7 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
         }//end loop over tracks
 
       }//end if cast exists
-  std::cout<<"line "<< __LINE__ << " RECO LEVEL ANALYSIS START OK 15" << std::endl;
+  std::cout << " RECO LEVEL ANALYSIS START OK 15" << std::endl;
       b_diMuonC_IsoTk_FittedVtx = diMuonC_IsoTk_FittedVtx;
       b_isoC_1mm = b_diMuonC_IsoTk_FittedVtx;
       b_diMuonCMu0_IsoTk0p3_FittedVtx = diMuonCMu0_IsoTk0p3_FittedVtx;
@@ -2080,7 +2120,7 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
   }//end diMuonC not null and vertex valid
 
   if ( diMuonF != NULL && diMuonF->vertexValid() ) {
-    std::cout<<"line "<< __LINE__ << " RECO LEVEL ANALYSIS START OK 15" << std::endl;
+    std::cout << " RECO LEVEL ANALYSIS START OK 15" << std::endl;
     double diMuonF_IsoTk_FittedVtx = -999.;
     double diMuonFMu0_IsoTk0p3_FittedVtx = -999.;
     double diMuonFMu0_IsoTk0p4_FittedVtx = -999.;
@@ -2089,8 +2129,8 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
     double diMuonFMu1_IsoTk0p4_FittedVtx = -999.;
     double diMuonFMu1_IsoTk0p5_FittedVtx = -999.;
 
-    const pat::PackedCandidate* candFittedVtx_diMuonFMu0 = dynamic_cast<const pat::PackedCandidate*>(diMuonF->muon(0)->sourceCandidatePtr(0).get());
-    const pat::PackedCandidate* candFittedVtx_diMuonFMu1 = dynamic_cast<const pat::PackedCandidate*>(diMuonF->muon(1)->sourceCandidatePtr(0).get());
+    const pat::PackedCandidate* candFittedVtx_diMuonFMu0 = dynamic_cast<const pat::PackedCandidate*>(diMuonF->muon(0)->sourceCandidatePtr(1).get());
+    const pat::PackedCandidate* candFittedVtx_diMuonFMu1 = dynamic_cast<const pat::PackedCandidate*>(diMuonF->muon(1)->sourceCandidatePtr(1).get());
 
     //Avoid null dynamic cast: casuing segmentation violation error
     //In cases no dynamic cast exists, the event shouldn't be considered
@@ -2113,8 +2153,8 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
           if ( tamu::helpers::sameTrack( &*track, &(candFittedVtx_diMuonFMu0->pseudoTrack()) ) || tamu::helpers::sameTrack( &*track, &(candFittedVtx_diMuonFMu1->pseudoTrack()) ) ) trackIsMuon = true;
           //If the other dimu exists, also exclude its signal muons
           if ( diMuonC != NULL && diMuonC->vertexValid() ) {
-            const pat::PackedCandidate* candTmp_diMuonCMu0 = dynamic_cast<const pat::PackedCandidate*>(diMuonC->muon(0)->sourceCandidatePtr(0).get());
-            const pat::PackedCandidate* candTmp_diMuonCMu1 = dynamic_cast<const pat::PackedCandidate*>(diMuonC->muon(1)->sourceCandidatePtr(0).get());
+            const pat::PackedCandidate* candTmp_diMuonCMu0 = dynamic_cast<const pat::PackedCandidate*>(diMuonC->muon(0)->sourceCandidatePtr(1).get());
+            const pat::PackedCandidate* candTmp_diMuonCMu1 = dynamic_cast<const pat::PackedCandidate*>(diMuonC->muon(1)->sourceCandidatePtr(1).get());
             if ( candTmp_diMuonCMu0!=0 && candTmp_diMuonCMu1!=0 && candTmp_diMuonCMu0->hasTrackDetails() && candTmp_diMuonCMu1->hasTrackDetails() ){
               if ( tamu::helpers::sameTrack( &*track, &(candTmp_diMuonCMu0->pseudoTrack()) ) || tamu::helpers::sameTrack( &*track, &(candTmp_diMuonCMu1->pseudoTrack()) ) ) trackIsMuon = true;
             }
@@ -2161,7 +2201,7 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
       b_diMuonFMu1_IsoTk0p4_FittedVtx = diMuonFMu1_IsoTk0p4_FittedVtx;
       b_diMuonFMu1_IsoTk0p5_FittedVtx = diMuonFMu1_IsoTk0p5_FittedVtx;
   }//end diMuonF not null and vertex valid
-  std::cout<<"line "<< __LINE__ << " RECO LEVEL ANALYSIS START OK 16" << std::endl;
+  std::cout << " RECO LEVEL ANALYSIS START OK 16" << std::endl;
   //Calculate track iso and multiplicity around standalone-only mu
   b_SAmu_nTrkWP1 = 0;//trk pt > 0.5
   b_SAmu_nTrkWP2 = 0;//trk pT > 1
@@ -2230,7 +2270,7 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
       b_SAmu_TrkIsoNodzWP3 += track->pt();
     }
   }//end loop over tracks
-  std::cout<<"line "<< __LINE__ << " RECO LEVEL ANALYSIS START OK 17" << std::endl;
+  std::cout << " RECO LEVEL ANALYSIS START OK 17" << std::endl;
   //Register pixel hits info for two muons of each dimuon
   b_nMuHasValidHitInPixel = 0;
   b_diMuonC_m1_FittedVtx_hitpix_Phase1 = -1000;
@@ -2298,7 +2338,7 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
       }//C innerTrack available
     }//end loop k
   }//end diMuonC not null
-  std::cout<<"line "<< __LINE__ << " RECO LEVEL ANALYSIS START OK 18" << std::endl;
+  std::cout << " RECO LEVEL ANALYSIS START OK 18" << std::endl;
   if ( diMuonF != NULL ) {
     for(uint32_t k=0;k<2;k++){
 
@@ -2337,11 +2377,259 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
       }//F innerTrack available
     }//end loop k
   }//end dimuF not null
-  std::cout<<"line "<< __LINE__ << " RECO LEVEL ANALYSIS START OK 19" << std::endl;
+  std::cout << " RECO LEVEL ANALYSIS START OK 19" << std::endl;
+  std::cout << " Control Region Events for BKG Modeling OK 20" << std::endl;
   //****************************************************************************
   //                    Control Region Events for BKG Modeling
   //****************************************************************************
+  FillTrigInfo(triggerComposition, triggerNames, NameAndNumb );
+  m_orphan_passOffLineSel = false;
+  m_orphan_passOffLineSelPtEta = false;
 
+  m_orphan_dimu_dR = -999.;
+  m_orphan_dimu_mass = -999.;
+  m_orphan_dimu_z = -999.;
+  m_orphan_dimu_Lxy  = -999.;
+  m_orphan_dimu_L    = -999.;
+  m_orphan_dimu_chi2 = -999.;
+  m_orphan_dimu_ndof = -999.;
+  m_orphan_dimu_prob = -999.;
+  m_orphan_dimu_isoTk = -999.;
+  m_orphan_dimu_Mu0_isoTk0p3 = -999.;
+  m_orphan_dimu_Mu0_isoTk0p4 = -999.;
+  m_orphan_dimu_Mu0_isoTk0p5 = -999.;
+  m_orphan_dimu_Mu1_isoTk0p3 = -999.;
+  m_orphan_dimu_Mu1_isoTk0p4 = -999.;
+  m_orphan_dimu_Mu1_isoTk0p5 = -999.;
+
+  m_orphan_PtOrph  = -99.;
+  m_orphan_EtaOrph = -99.;
+  m_orphan_matched_segs_Orph = -1;
+  m_orphan_PtMu0   = -99.;
+  m_orphan_EtaMu0  = -99.;
+  m_orphan_matched_segs_Mu0  = -1;
+  m_orphan_PtMu1   = -99.;
+  m_orphan_EtaMu1  = -99.;
+  m_orphan_matched_segs_Mu1  = -1;
+
+  m_orphan_isoTk = -999.;
+  m_orphan_dimu_nSAMu = 0;
+  m_orphan_dimu_nNonTrackerMu = 0;
+  m_orphan_nSAMu = 0;
+  m_orphan_nNonTrackerMu = 0;
+
+  //Note: b-tagging itself is from MVA which could probably introduce bias
+  int NPATJet        = 0;
+  int NPATJetTightB  = 0;
+  int NPATJetMediumB = 0;
+  int NPATJetLooseB  = 0;
+  edm::Handle<std::vector<pat::Jet> > PATJet;
+  iEvent.getByToken(m_PATJet, PATJet);
+  for( auto Myjet = PATJet->begin(); Myjet != PATJet->end(); ++Myjet ){
+    if( fabs(Myjet->eta()) < 2.4 && Myjet->pt() > 10. ){
+      // B-tags: https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD2017#Jets
+      // 2017 WP: https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation94X
+      b_PAT_jet_pt[NPATJet]   = Myjet->pt();
+      b_PAT_jet_eta[NPATJet]  = Myjet->eta();
+      b_PAT_jet_phi[NPATJet]  = Myjet->phi();
+      b_PAT_jet_E[NPATJet]    = Myjet->energy();
+      b_PAT_jet_CSVv2[NPATJet] = Myjet->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags");
+      if( b_PAT_jet_CSVv2[NPATJet] > 0.9693 ) NPATJetTightB++;
+      if( b_PAT_jet_CSVv2[NPATJet] > 0.8838 ) NPATJetMediumB++;
+      if( b_PAT_jet_CSVv2[NPATJet] > 0.5803 ) NPATJetLooseB++;
+      NPATJet++;
+    }
+  }//end loop over jets
+  std::cout << " Control Region Events for BKG Modeling OK 21" << std::endl;
+  b_NPATJet = NPATJet;
+  b_NPATJetTightB = NPATJetTightB;
+  b_NPATJetMediumB = NPATJetMediumB;
+  b_NPATJetLooseB = NPATJetLooseB;
+
+  edm::Handle<pat::MuonCollection> orphans_unsorted;
+  iEvent.getByToken(m_muJetOrphans, orphans_unsorted);
+  std::vector<const pat::Muon*> orphans;
+  for (pat::MuonCollection::const_iterator iOrph = orphans_unsorted->begin();  iOrph != orphans_unsorted->end();  ++iOrph) {
+    orphans.push_back( &(*iOrph) );
+  }
+
+  // Sort orphan muons by pT (leading pT first)
+  if ( orphans.size() > 1 ) std::sort( orphans.begin(), orphans.end(), tamu::helpers::PtOrderRecoMu );
+  b_nOrphans = orphans.size();
+
+  //===============================================================================
+  //                      Control Region Event Selection
+  //Run 2: 1 dimuon and >=1 orphan muon, need at least 3 muons to fire the HLT
+  //===============================================================================
+  std::cout << " Control Region Events for BKG Modeling OK 22" << std::endl;
+  if (b_nMuJets == 1  &&  (*muJets)[0].numberOfDaughters() == 2  &&  b_nOrphans >= 1 ) {
+    m_orphan_passOffLineSel = true;
+    pat::MultiMuonCollection::const_iterator muJet = muJets->begin();
+    m_orphan_PtOrph  = orphans[0]->pt();
+    m_orphan_EtaOrph = orphans[0]->eta();
+    m_orphan_matched_segs_Orph = orphans[0]->numberOfMatches(reco::Muon::SegmentAndTrackArbitration);
+    m_orphan_PtMu0   = muJet->muon(0)->pt();
+    m_orphan_EtaMu0  = muJet->muon(0)->eta();
+    m_orphan_matched_segs_Mu0  = muJet->muon(0)->numberOfMatches(reco::Muon::SegmentAndTrackArbitration);
+    m_orphan_PtMu1   = muJet->muon(1)->pt();
+    m_orphan_EtaMu1  = muJet->muon(1)->eta();
+    m_orphan_matched_segs_Mu1  = muJet->muon(1)->numberOfMatches(reco::Muon::SegmentAndTrackArbitration);
+
+    if ( muJet->vertexValid() ){
+      std::cout << " Control Region Events for BKG Modeling OK 23" << std::endl;
+      m_orphan_dimu_mass = muJet->vertexMass();
+      m_orphan_dimu_z    = muJet->vertexDz(beamSpot->position());
+      m_orphan_dimu_Lxy  = muJet->vertexLxy(beamSpotPosition);
+      m_orphan_dimu_L    = muJet->vertexL(beamSpotPosition);
+      //fitted vtx GoF
+      m_orphan_dimu_chi2 = muJet->vertexChi2();
+      m_orphan_dimu_ndof = muJet->vertexNdof();
+      m_orphan_dimu_prob = muJet->vertexProb();
+    }
+    m_orphan_dimu_dR = muJet->dR(0, 1, muJet->vertexValid());
+  std::cout << " Control Region Events for BKG Modeling OK 23" << std::endl;
+    //This part echos the branches/tags for 2 dimu events
+    if ( muJet->numberOfDaughters() == 2 ) {
+      if( muJet->muon(0)->isStandAloneMuon() && !( muJet->muon(0)->isPFMuon() && ( muJet->muon(0)->isTrackerMuon() || muJet->muon(0)->isGlobalMuon() ) ) ) m_orphan_dimu_nSAMu++;
+      if( muJet->muon(1)->isStandAloneMuon() && !( muJet->muon(1)->isPFMuon() && ( muJet->muon(1)->isTrackerMuon() || muJet->muon(1)->isGlobalMuon() ) ) ) m_orphan_dimu_nSAMu++;
+      if( muJet->muon(0)->isPFMuon() && muJet->muon(0)->isGlobalMuon() && !muJet->muon(0)->isTrackerMuon() ) m_orphan_dimu_nNonTrackerMu++;
+      if( muJet->muon(1)->isPFMuon() && muJet->muon(1)->isGlobalMuon() && !muJet->muon(1)->isTrackerMuon() ) m_orphan_dimu_nNonTrackerMu++;
+    }
+
+    if( orphans[0]->isStandAloneMuon() && !( orphans[0]->isPFMuon() && ( orphans[0]->isTrackerMuon() || orphans[0]->isGlobalMuon() ) ) ) m_orphan_nSAMu++;//1 or 0
+    if( orphans[0]->isPFMuon() && orphans[0]->isGlobalMuon() && !orphans[0]->isTrackerMuon() ) m_orphan_nNonTrackerMu++;//1 or 0
+
+    int nMuHighPtOrphanDimu = 0;//tot number of high pT mu in orph-dimu event (Need >= 2 for trigger reasons)
+    int nMuLowPtOrphanDimu  = 0;//tot number of low pT mu in orph-dimu event (Need == 3 for trigger reasons)
+    double triPt[3]  = {m_orphan_PtMu0, m_orphan_PtMu1, m_orphan_PtOrph};
+    double triEta[3] = {fabs(m_orphan_EtaMu0), fabs(m_orphan_EtaMu1), fabs(m_orphan_EtaOrph)};
+    for ( int i = 0; i < 3; i++ ) {
+      if( triPt[i] > m_threshold_high_pT && triEta[i] < m_threshold_low_eta ) nMuHighPtOrphanDimu++;
+      if( triPt[i] > m_threshold_low_pT && triEta[i] < m_threshold_high_eta ) nMuLowPtOrphanDimu++;
+    }
+
+    if( nMuHighPtOrphanDimu >= 2 && nMuLowPtOrphanDimu == 3 ) m_orphan_passOffLineSelPtEta = true;
+
+    if( m_orphan_passOffLineSelPtEta ) FillTrigInfo(triggerComposition_bb, triggerNames, NameAndNumb );
+  std::cout << " Control Region Events for BKG Modeling OK 24" << std::endl;
+    //@Wei Shi 10.25.2018: Can't use the old method in AOD below since MiniAOD has different precision for the two collections:
+    /*if (tamu::helpers::sameTrack(&*track,&*(muJet->muon(0)->innerTrack())) ||
+          tamu::helpers::sameTrack(&*track,&*(muJet->muon(1)->innerTrack()))) track_is_muon = true;
+    */
+    //Instead, get the packed PF candidate associated to the slimmedMuons, and then use the pseudoTrack pointer, this is essentially
+    //what was done for the unpackedTracksAndVertices collection(i.e., tracks here)
+    //Refer to MiniAOD workbook: https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD2017#Pointers_and_navigation
+    //and https://github.com/cms-sw/cmssw/blob/CMSSW_9_4_X/PhysicsTools/PatAlgos/plugins/TrackAndVertexUnpacker.cc#L87
+    if ( muJet->vertexValid() ){
+      const pat::PackedCandidate* candOrphanDimu0;
+      std::cout << " Control Region Events for BKG Modeling OK 24.1" <<candOrphanDimu0<<"hbchyhby5hy5hy5ht"<< std::endl;
+      candOrphanDimu0 = dynamic_cast<const pat::PackedCandidate*>(muJet->muon(0)->sourceCandidatePtr(1).get());
+      std::cout << " Control Region Events for BKG Modeling OK 24.1.1" << std::endl;
+      const pat::PackedCandidate* candOrphanDimu1 = dynamic_cast<const pat::PackedCandidate*>(muJet->muon(1)->sourceCandidatePtr(1).get());
+      std::cout << " Control Region Events for BKG Modeling OK 24.1.2" << std::endl;
+      const pat::PackedCandidate* candOrphan = dynamic_cast<const pat::PackedCandidate*>(orphans[0]->sourceCandidatePtr(1).get());
+      std::cout << " Control Region Events for BKG Modeling OK 24.1.3" << std::endl;
+      if ( candOrphanDimu0 != 0 && candOrphanDimu1 != 0 && candOrphan != 0 && candOrphanDimu0->hasTrackDetails() && candOrphanDimu1->hasTrackDetails() && candOrphan->hasTrackDetails() ){
+        std::cout << " Control Region Events for BKG Modeling OK 24.2" << std::endl;
+        m_orphan_isoTk = 0.;
+        m_orphan_dimu_isoTk = 0.;
+        m_orphan_dimu_Mu0_isoTk0p3 = 0.;
+        m_orphan_dimu_Mu0_isoTk0p4 = 0.;
+        m_orphan_dimu_Mu0_isoTk0p5 = 0.;
+        m_orphan_dimu_Mu1_isoTk0p3 = 0.;
+        m_orphan_dimu_Mu1_isoTk0p4 = 0.;
+        m_orphan_dimu_Mu1_isoTk0p5 = 0.;
+
+        for (reco::TrackCollection::const_iterator track = tracks->begin(); track != tracks->end(); ++track) {
+          std::cout << " Control Region Events for BKG Modeling OK 24.3" << std::endl;
+          bool track_is_muon = false;
+
+          if ( tamu::helpers::sameTrack( &*track, &(candOrphanDimu0->pseudoTrack()) ) || tamu::helpers::sameTrack( &*track, &(candOrphanDimu1->pseudoTrack()) ) || tamu::helpers::sameTrack( &*track, &(candOrphan->pseudoTrack()) ) ) track_is_muon = true;
+
+          if ( track_is_muon == false ) {
+            std::cout << " Control Region Events for BKG Modeling OK 24.4" << std::endl;
+            /*Iso for orphan associated dimuon*/
+            double dphi = tamu::helpers::My_dPhi( muJet->vertexMomentum().phi(), track->phi() );
+            double deta = muJet->vertexMomentum().eta() - track->eta();
+            double dR   = sqrt(pow(dphi, 2) + pow(deta, 2));
+            double dz   = track->dz(beamSpot->position()) - m_orphan_dimu_z;
+            if ( dR < m_threshold_DiMuons_Iso_dR && track->pt() > m_threshold_DiMuons_Iso_pT && fabs(dz) < m_threshold_DiMuons_Iso_dz ) m_orphan_dimu_isoTk += track->pt();
+
+            /*Iso for orphan associated dimu mu0*/
+            double dPhiMu0 = tamu::helpers::My_dPhi( candOrphanDimu0->pseudoTrack().phi(), track->phi() );
+            double dEtaMu0 = candOrphanDimu0->pseudoTrack().eta() - track->eta();
+            double dRMu0   = sqrt( dPhiMu0*dPhiMu0 + dEtaMu0*dEtaMu0 );
+            double dzMu0   = candOrphanDimu0->pseudoTrack().dz(beamSpot->position()) - track->dz(beamSpot->position());
+            if ( dRMu0 < 0.3 && track->pt() > 0.5 && fabs( dzMu0 ) < 0.1 ) m_orphan_dimu_Mu0_isoTk0p3 += track->pt(); //cone size: 0.3
+            if ( dRMu0 < 0.4 && track->pt() > 0.5 && fabs( dzMu0 ) < 0.1 ) m_orphan_dimu_Mu0_isoTk0p4 += track->pt(); //cone size: 0.4
+            if ( dRMu0 < 0.5 && track->pt() > 0.5 && fabs( dzMu0 ) < 0.1 ) m_orphan_dimu_Mu0_isoTk0p5 += track->pt(); //cone size: 0.5
+
+            /*Iso for orphan associated dimu mu1*/
+            double dPhiMu1 = tamu::helpers::My_dPhi( candOrphanDimu1->pseudoTrack().phi(), track->phi() );
+            double dEtaMu1 = candOrphanDimu1->pseudoTrack().eta() - track->eta();
+            double dRMu1   = sqrt( dPhiMu1*dPhiMu1 + dEtaMu1*dEtaMu1 );
+            double dzMu1   = candOrphanDimu1->pseudoTrack().dz(beamSpot->position()) - track->dz(beamSpot->position());
+            if ( dRMu1 < 0.3 && track->pt() > 0.5 && fabs( dzMu1 ) < 0.1 ) m_orphan_dimu_Mu1_isoTk0p3 += track->pt(); //cone size: 0.3
+            if ( dRMu1 < 0.4 && track->pt() > 0.5 && fabs( dzMu1 ) < 0.1 ) m_orphan_dimu_Mu1_isoTk0p4 += track->pt(); //cone size: 0.4
+            if ( dRMu1 < 0.5 && track->pt() > 0.5 && fabs( dzMu1 ) < 0.1 ) m_orphan_dimu_Mu1_isoTk0p5 += track->pt(); //cone size: 0.5
+
+            /*Iso for orphan muon*/
+            double dphiOrph = tamu::helpers::My_dPhi( candOrphan->pseudoTrack().phi(), track->phi() );
+            double detaOrph = candOrphan->pseudoTrack().eta() - track->eta();
+            double dROrph = sqrt(pow(dphiOrph, 2) + pow(detaOrph, 2));
+            double dzOrph = candOrphan->pseudoTrack().dz(beamSpot->position()) - track->dz(beamSpot->position());
+            if ( dROrph < m_threshold_DiMuons_Iso_dR && track->pt() > m_threshold_DiMuons_Iso_pT && fabs(dzOrph) < m_threshold_DiMuons_Iso_dz ) m_orphan_isoTk += track->pt();
+
+          }//End if track_is_muon
+        }//End loop over tracks
+      }//end if cast exists
+    }//end if vertex valid
+  std::cout << " Control Region Events for BKG Modeling OK 25" << std::endl;
+    //Register pixel hits info for the orphan-dimu
+    m_orphan_dimu_Mu0_hitpix_Phase1              = -1000;
+    m_orphan_dimu_Mu1_hitpix_Phase1              = -1000;
+    m_orphan_dimu_Mu0_ValidPixelHits             = -1000;
+    m_orphan_dimu_Mu1_ValidPixelHits             = -1000;
+    m_orphan_dimu_Mu0_ValidPixelBarrelHits       = -1000;
+    m_orphan_dimu_Mu1_ValidPixelBarrelHits       = -1000;
+    m_orphan_dimu_Mu0_ValidPixelEndcapHits       = -1000;
+    m_orphan_dimu_Mu1_ValidPixelEndcapHits       = -1000;
+    m_orphan_dimu_Mu0_pixelLayersWithMeasurement = -1000;
+    m_orphan_dimu_Mu1_pixelLayersWithMeasurement = -1000;
+
+    for(uint32_t l=0;l<2;l++){
+      if ( muJet->muon(l)->innerTrack().isAvailable() ){
+        const reco::HitPattern& p = muJet->muon(l)->innerTrack()->hitPattern();
+
+        if( p.hasValidHitInPixelLayer(PixelSubdetector::PixelBarrel, 1) || p.hasValidHitInPixelLayer(PixelSubdetector::PixelEndcap, 1) ||
+            p.hasValidHitInPixelLayer(PixelSubdetector::PixelBarrel, 2) || p.hasValidHitInPixelLayer(PixelSubdetector::PixelEndcap, 2) ||
+            p.hasValidHitInPixelLayer(PixelSubdetector::PixelBarrel, 3) || p.hasValidHitInPixelLayer(PixelSubdetector::PixelEndcap, 3) ||
+            p.hasValidHitInPixelLayer(PixelSubdetector::PixelBarrel, 4) ){
+              if(l==0) m_orphan_dimu_Mu0_hitpix_Phase1 = 1;
+              if(l==1) m_orphan_dimu_Mu1_hitpix_Phase1 = 1;
+        }
+        //Refer to: https://github.com/cms-sw/cmssw/blob/master/DataFormats/TrackReco/interface/HitPattern.h#L294
+        if ( p.numberOfValidPixelHits() > 0 ){
+          if(l==0) m_orphan_dimu_Mu0_ValidPixelHits = p.numberOfValidPixelHits();
+          if(l==1) m_orphan_dimu_Mu1_ValidPixelHits = p.numberOfValidPixelHits();
+        }
+        if ( p.numberOfValidPixelBarrelHits() > 0 ){
+          if(l==0) m_orphan_dimu_Mu0_ValidPixelBarrelHits = p.numberOfValidPixelBarrelHits();
+          if(l==1) m_orphan_dimu_Mu1_ValidPixelBarrelHits = p.numberOfValidPixelBarrelHits();
+        }
+        if ( p.numberOfValidPixelEndcapHits() > 0 ){
+          if(l==0) m_orphan_dimu_Mu0_ValidPixelEndcapHits = p.numberOfValidPixelEndcapHits();
+          if(l==1) m_orphan_dimu_Mu1_ValidPixelEndcapHits = p.numberOfValidPixelEndcapHits();
+        }
+        if ( p.pixelLayersWithMeasurement() > 0 ){
+          if(l==0) m_orphan_dimu_Mu0_pixelLayersWithMeasurement = p.pixelLayersWithMeasurement();
+          if(l==1) m_orphan_dimu_Mu1_pixelLayersWithMeasurement = p.pixelLayersWithMeasurement();
+        }
+      }//orphan-dimu innerTrack available
+    }//end for loop l
+  }//end event selection: one dimuon + one orphan
+  std::cout << " Control Region Events for BKG Modeling OK 26" << std::endl;
+  std::cout << " Control Region Event Selection Finish OK 27" << std::endl;
   //===============================================================================
   //                      Control Region Event Selection Finish
   //===============================================================================
@@ -2364,6 +2652,7 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
         }
     }
   }
+  std::cout << " Control Region Event Selection Finish OK 28" << std::endl;
   edm::Handle<reco::VertexCollection> primaryVertices;
   iEvent.getByToken(m_primaryVertices, primaryVertices);
 
@@ -2379,7 +2668,7 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
       b_orphan_isVertexOK = true;
     }
   }
-
+  std::cout << " Control Region Event Selection Finish OK 29" << std::endl;
   // Check secondary vertices
   edm::Handle<reco::VertexCollection> secondaryVertices;
   iEvent.getByToken(m_secondaryVertices, secondaryVertices);
@@ -2391,7 +2680,7 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
       //std::cout<<"trk pT   [GeV]: "<<tt->castTo<reco::TrackRef>()->pt()<<std::endl;
     }
   }
-  
+  std::cout << " Control Region Event Selection Finish OK 30" << std::endl;
   if ( m_debug > 0 ) std::cout << m_events << " Stop RECO Level" << std::endl;
   //****************************************************************************
   //                          RECO LEVEL ANALYSIS FINISH
@@ -2403,12 +2692,13 @@ void CutFlowAnalyzer_MiniAOD_Run3::analyze(const edm::Event& iEvent, const edm::
   if(skimOutput_) { if (b_massC>-1. && b_massF>-1.) m_ttree->Fill(); }
   else m_ttree->Fill();
 
+  if(m_orphan_passOffLineSel) m_ttree_orphan->Fill();
 }
 
 
 // ------------ method called once each job just before starting event loop  ------------
 void
-CutFlowAnalyzer_MiniAOD_Run3::beginJob() {
+CutFlowAnalyzer_MiniAOD::beginJob() {
   std::cout << "BEGIN JOB" << std::endl;
   edm::Service<TFileService> tFileService;
 
@@ -2819,19 +3109,73 @@ CutFlowAnalyzer_MiniAOD_Run3::beginJob() {
   //****************************************************************************
   //                       Main Tree for Control Region Events
   //****************************************************************************
-
+  m_ttree_orphan = tFileService->make<TTree>("Events_orphan", "Events_orphan");
+  m_ttree_orphan->Branch("run",   &b_run,   "run/I");
+  m_ttree_orphan->Branch("lumi",  &b_lumi,  "lumi/I");
+  m_ttree_orphan->Branch("event", &b_event, "event/I");
+  m_ttree_orphan->Branch("orph_isSignalHLTFired",    &b_isSignalHLTFired,    "orph_isSignalHLTFired/O");
+  m_ttree_orphan->Branch("orph_isSignalHLT_0_Fired", &b_isSignalHLT_0_Fired, "orph_isSignalHLT_0_Fired/O");
+  m_ttree_orphan->Branch("orph_isSignalHLT_1_Fired", &b_isSignalHLT_1_Fired, "orph_isSignalHLT_1_Fired/O");
+  m_ttree_orphan->Branch("orph_isSignalHLT_2_Fired", &b_isSignalHLT_2_Fired, "orph_isSignalHLT_2_Fired/O");
+  m_ttree_orphan->Branch("orph_isSignalHLT_3_Fired", &b_isSignalHLT_3_Fired, "orph_isSignalHLT_3_Fired/O");
+  m_ttree_orphan->Branch("orph_isVertexOK",          &b_orphan_isVertexOK,   "orph_isVertexOK/O");
+  m_ttree_orphan->Branch("orph_dimu_nSAMu",                          &m_orphan_dimu_nSAMu,                          "orph_dimu_nSAMu/I");
+  m_ttree_orphan->Branch("orph_dimu_nNonTrackerMu",                  &m_orphan_dimu_nNonTrackerMu,                  "orph_dimu_nNonTrackerMu/I");
+  m_ttree_orphan->Branch("orph_nSAMu",                               &m_orphan_nSAMu,                               "orph_nSAMu/I");
+  m_ttree_orphan->Branch("orph_nNonTrackerMu",                       &m_orphan_nNonTrackerMu,                       "orph_nNonTrackerMu/I");
+  m_ttree_orphan->Branch("orph_dimu_Mu0_hitpix_Phase1",              &m_orphan_dimu_Mu0_hitpix_Phase1,              "orph_dimu_Mu0_hitpix_Phase1/I");
+  m_ttree_orphan->Branch("orph_dimu_Mu1_hitpix_Phase1",              &m_orphan_dimu_Mu1_hitpix_Phase1,              "orph_dimu_Mu1_hitpix_Phase1/I");
+  m_ttree_orphan->Branch("orph_dimu_Mu0_ValidPixelHits",             &m_orphan_dimu_Mu0_ValidPixelHits,             "orph_dimu_Mu0_ValidPixelHits/I");
+  m_ttree_orphan->Branch("orph_dimu_Mu1_ValidPixelHits",             &m_orphan_dimu_Mu1_ValidPixelHits,             "orph_dimu_Mu1_ValidPixelHits/I");
+  m_ttree_orphan->Branch("orph_dimu_Mu0_ValidPixelBarrelHits",       &m_orphan_dimu_Mu0_ValidPixelBarrelHits,       "orph_dimu_Mu0_ValidPixelBarrelHits/I");
+  m_ttree_orphan->Branch("orph_dimu_Mu1_ValidPixelBarrelHits",       &m_orphan_dimu_Mu1_ValidPixelBarrelHits,       "orph_dimu_Mu1_ValidPixelBarrelHits/I");
+  m_ttree_orphan->Branch("orph_dimu_Mu0_ValidPixelEndcapHits",       &m_orphan_dimu_Mu0_ValidPixelEndcapHits,       "orph_dimu_Mu0_ValidPixelEndcapHits/I");
+  m_ttree_orphan->Branch("orph_dimu_Mu1_ValidPixelEndcapHits",       &m_orphan_dimu_Mu1_ValidPixelEndcapHits,       "orph_dimu_Mu1_ValidPixelEndcapHits/I");
+  m_ttree_orphan->Branch("orph_dimu_Mu0_pixelLayersWithMeasurement", &m_orphan_dimu_Mu0_pixelLayersWithMeasurement, "orph_dimu_Mu0_pixelLayersWithMeasurement/I");
+  m_ttree_orphan->Branch("orph_dimu_Mu1_pixelLayersWithMeasurement", &m_orphan_dimu_Mu1_pixelLayersWithMeasurement, "orph_dimu_Mu1_pixelLayersWithMeasurement/I");
+  m_ttree_orphan->Branch("orph_dimu_dR",   &m_orphan_dimu_dR,   "orph_dimu_dR/F");
+  m_ttree_orphan->Branch("orph_dimu_mass", &m_orphan_dimu_mass, "orph_dimu_mass/F");
+  m_ttree_orphan->Branch("orph_dimu_z",    &m_orphan_dimu_z,    "orph_dimu_z/F");
+  m_ttree_orphan->Branch("orph_dimu_Lxy",  &m_orphan_dimu_Lxy,  "orph_dimu_Lxy/F");
+  m_ttree_orphan->Branch("orph_dimu_L",    &m_orphan_dimu_L,    "orph_dimu_L/F");
+  m_ttree_orphan->Branch("orph_dimu_chi2", &m_orphan_dimu_chi2, "orph_dimu_chi2/F");
+  m_ttree_orphan->Branch("orph_dimu_ndof", &m_orphan_dimu_ndof, "orph_dimu_ndof/F");
+  m_ttree_orphan->Branch("orph_dimu_prob", &m_orphan_dimu_prob, "orph_dimu_prob/F");
+  m_ttree_orphan->Branch("orph_isoTk",               &m_orphan_isoTk,               "orph_isoTk/F");
+  m_ttree_orphan->Branch("orph_dimu_isoTk",          &m_orphan_dimu_isoTk,          "orph_dimu_isoTk/F");
+  m_ttree_orphan->Branch("orph_dimu_Mu0_isoTk0p3",   &m_orphan_dimu_Mu0_isoTk0p3,   "orph_dimu_Mu0_isoTk0p3/F");
+  m_ttree_orphan->Branch("orph_dimu_Mu0_isoTk0p4",   &m_orphan_dimu_Mu0_isoTk0p4,   "orph_dimu_Mu0_isoTk0p4/F");
+  m_ttree_orphan->Branch("orph_dimu_Mu0_isoTk0p5",   &m_orphan_dimu_Mu0_isoTk0p5,   "orph_dimu_Mu0_isoTk0p5/F");
+  m_ttree_orphan->Branch("orph_dimu_Mu1_isoTk0p3",   &m_orphan_dimu_Mu1_isoTk0p3,   "orph_dimu_Mu1_isoTk0p3/F");
+  m_ttree_orphan->Branch("orph_dimu_Mu1_isoTk0p4",   &m_orphan_dimu_Mu1_isoTk0p4,   "orph_dimu_Mu1_isoTk0p4/F");
+  m_ttree_orphan->Branch("orph_dimu_Mu1_isoTk0p5",   &m_orphan_dimu_Mu1_isoTk0p5,   "orph_dimu_Mu1_isoTk0p5/F");
+  m_ttree_orphan->Branch("orph_passOffLineSel",      &m_orphan_passOffLineSel,      "orph_passOffLineSel/O");
+  m_ttree_orphan->Branch("orph_passOffLineSelPtEta", &m_orphan_passOffLineSelPtEta, "orph_passOffLineSelPtEta/O");
+  m_ttree_orphan->Branch("orph_PtOrph",  &m_orphan_PtOrph,  "orph_PtOrph/F");
+  m_ttree_orphan->Branch("orph_EtaOrph", &m_orphan_EtaOrph, "orph_EtaOrph/F");
+  m_ttree_orphan->Branch("orph_matched_segs_Orph", &m_orphan_matched_segs_Orph, "orph_matched_segs_Orph/I");
+  m_ttree_orphan->Branch("orph_PtMu0",   &m_orphan_PtMu0,   "orph_PtMu0/F");
+  m_ttree_orphan->Branch("orph_EtaMu0",  &m_orphan_EtaMu0,  "orph_EtaMu0/F");
+  m_ttree_orphan->Branch("orph_matched_segs_Mu0", &m_orphan_matched_segs_Mu0, "orph_matched_segs_Mu0/I");
+  m_ttree_orphan->Branch("orph_PtMu1",   &m_orphan_PtMu1,   "orph_PtMu1/F");
+  m_ttree_orphan->Branch("orph_EtaMu1",  &m_orphan_EtaMu1,  "orph_EtaMu1/F");
+  m_ttree_orphan->Branch("orph_matched_segs_Mu1", &m_orphan_matched_segs_Mu1, "orph_matched_segs_Mu1/I");
+  m_ttree_orphan->Branch("NPATJet",        &b_NPATJet,        "NPATJet/I");
+  m_ttree_orphan->Branch("NPATJetTightB",  &b_NPATJetTightB,  "NPATJetTightB/I");
+  m_ttree_orphan->Branch("NPATJetMediumB", &b_NPATJetMediumB, "NPATJetMediumB/I");
+  m_ttree_orphan->Branch("NPATJetLooseB",  &b_NPATJetLooseB,  "NPATJetLooseB/I");
 
 }//end beginJob
 
 // ------------ method called once each job just after ending the event loop  ------------
 void
-CutFlowAnalyzer_MiniAOD_Run3::endJob()
+CutFlowAnalyzer_MiniAOD::endJob()
 {
   using namespace std;
   cout << "END JOB" << endl;
 }
 
-void CutFlowAnalyzer_MiniAOD_Run3::FillTrigInfo( TH1F * h1, const edm::TriggerNames& triggerNames, std::map<int,std::string> nameAndNumb )
+void CutFlowAnalyzer_MiniAOD::FillTrigInfo( TH1F * h1, const edm::TriggerNames& triggerNames, std::map<int,std::string> nameAndNumb )
 {
   for( unsigned int i=0; i<nameAndNumb.size(); i++ ){
     for (unsigned int itrig = 0; itrig != triggerNames.size(); ++itrig) {
@@ -2845,7 +3189,7 @@ void CutFlowAnalyzer_MiniAOD_Run3::FillTrigInfo( TH1F * h1, const edm::TriggerNa
 }
 
 // ------------ method called when ending the processing of a run  ------------
-void CutFlowAnalyzer_MiniAOD_Run3::endRun(edm::Run const&, edm::EventSetup const&)
+void CutFlowAnalyzer_MiniAOD::endRun(edm::Run const&, edm::EventSetup const&)
 {
 }
 
@@ -2863,7 +3207,7 @@ void CutFlowAnalyzer_MiniAOD::endLuminosityBlock(edm::LuminosityBlock const&, ed
 */
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
-void CutFlowAnalyzer_MiniAOD_Run3::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+void CutFlowAnalyzer_MiniAOD::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
@@ -2872,5 +3216,4 @@ void CutFlowAnalyzer_MiniAOD_Run3::fillDescriptions(edm::ConfigurationDescriptio
 }
 //Indentation change
 //define this as a plug-in
-DEFINE_FWK_MODULE(CutFlowAnalyzer_MiniAOD_Run3);
-
+DEFINE_FWK_MODULE(CutFlowAnalyzer_MiniAOD);
