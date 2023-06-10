@@ -6,7 +6,7 @@ NOTE: The production of the LHE files does not require a CMS release.
 
 cmsDrivers
 ============
-NOTE: Unless you have produced a new LHE file using MadGraph5, the steps in this section do not need to be performed, you can just skip to the Condor JObs section. This is just the path followed to produce the 'DarkSUSY_mH_125_mN1_10_mND_1_mGammaD_0p25_13p6TeV_cT_0p1_events100k.root' file.
+NOTE: Unless you have produced a new LHE file using MadGraph5, the steps in this section do not need to be performed, you can just skip to the Condor Jobs section. This is just the path followed to produce the 'DarkSUSY_mH_125_mN1_10_mND_1_mGammaD_0p25_13p6TeV_cT_0p1_events100k.root' file.
 
 Once the LHE file has been produced, this will need to be converted into a root file for further processing. This is done using
 the cmsDrivers command:
