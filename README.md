@@ -12,6 +12,7 @@ The anlayzer works with CMSSW_12_4_11_patch3.
     cd CMSSW_12_4_11_patch3/src
     git clone https://github.com/Hedwinaaron/MuJetAnalysis_Run3.git
     cd MuJetAnalysis_Run3
+    cmsenv
     scram b
 
 By issuing the command:
