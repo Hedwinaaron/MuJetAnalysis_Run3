@@ -33,7 +33,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     dropDescendantsOfDroppedBranches = cms.untracked.bool(False),
-    fileNames = cms.untracked.vstring('file:/eos/user/h/hencinas/Dark_photo_sample_analysis/CMSSW_12_4_11_patch3/src/13p6Tev_samples/cT_0p1/DarkSUSY_mH_125_mN1_10_mND_1_mGammaD_0p25_13p6TeV_cT_0p1_events100k.root'),
+    fileNames = cms.untracked.vstring('file:DarkSUSY_mH_125_mN1_10_mND_1_mGammaD_0p25_13p6TeV_cT_0p1_events100k.root'),
     inputCommands = cms.untracked.vstring(
         'keep *',
         'drop LHEXMLStringProduct_*_*_*'
