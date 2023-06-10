@@ -1,0 +1,13 @@
+executable            = shel_comands.sh
+arguments             = $(ClusterID) $(ProcId)
+output                = output/MUO-Hadronizer_TuneCUETP8M1_13TeV_generic_LHE_pythia8_cff_py_GEN_SIM-00002.$(ClusterId).$(ProcId).out
+output_destination    = root://eosuser.cern.ch//eos/user/h/hencinas/$(ClusterID)/
+MY.XRDCP_CREATE_DIR   = True
+error                 = error/MUO-Hadronizer_TuneCUETP8M1_13TeV_generic_LHE_pythia8_cff_py_GEN_SIM-00002.$(ClusterId).$(ProcId).err
+log                   = log/Hadronizer_TuneCUETP8M1_13TeV_generic_LHE_pythia8_cff_py_GEN_SIM-00002.$(ClusterId).log
+universe              = vanilla
++JobFlavour           = "testmatch"
+RequestCpus           = 6
+notification          = complete
+queue 
+
