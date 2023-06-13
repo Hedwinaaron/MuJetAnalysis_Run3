@@ -24,7 +24,24 @@ The second step is the Hadronization of the events, again this is done using cms
     cmsDriver.py Configuration/Generator/python/Hadronizer_TuneCUETP8M1_13TeV_generic_LHE_pythia8_cff.py --mc --eventcontent RAWSIM --datatier RAWSIM --conditions 124X_mcRun3_2022_realistic_postEE_v1 --step GEN,SIM  --nThreads 4 --era Run3 --geometry DB:Extended  --beamspot  Realistic25ns13p6TeVEarly2022Collision  --filein file:DarkSUSY_mH_125_mN1_10_mND_1_mGammaD_0p25_13p6TeV_cT_0p1_events100k.root --fileout file:DarkSUSY_mH_125_mN1_10_mND_1_mGammaD_0p25_13p6TeV_cT_0p1_events100k_GEN-SIM.root  -n -1 --no_exec
 
 This command will produce the python script 'Hadronizer_TuneCUETP8M1_13TeV_generic_LHE_pythia8_cff_py_GEN_SIM.py', which will Hadronize the events in the 'DarkSUSY_mH_125_mN1_10_mND_1_mGammaD_0p25_13p6TeV_cT_0p1_events100k.root'.
-In this step, it is best to let a job system handle the workload.
+The third step in the chain of production is DIGI,L1,DIGI2RAW,HLT:2022v14:
+
+        cmsDriver.py step2  --mc --eventcontent RAWSIM --datatier GEN-SIM-RAW --conditions  124X_mcRun3_2022_realistic_postEE_v1 --pileup_input                 "dbs:/MinBias_TuneCP5_13p6TeV-pythia8/Run3Summer22GS-124X_mcRun3_2022_realistic_v10-v1/GEN-SIM" --pileup 2022_LHC_Simulation_10h_2h --step DIGI,L1,DIGI2RAW,HLT:2022v14 --nThreads 4 --geometry DB:Extended --era Run3  --filein file:input.root --fileout file:output.root -n -1 --no_exec
+ 
+To acces the pileup files you will need GRID access, run:
+ 
+        voms-proxy-init --rfc --voms cms -valid 192:00
+  
+The next step is producing the ADO, for this you can run this comand 
+
+        cmsDriver.py step3  --mc --eventcontent AODSIM --datatier AODSIM --conditions  124X_mcRun3_2022_realistic_postEE_v1 --step L1Reco,RECO,RECOSIM  --nThreads 4 --geometry DB:Extended --era Run3  --filein file:input.root --fileout  file:output.root -n -1 --no_exec
+        
+The final step is producing the MINIAOD:
+
+
+        cmsDriver.py step4 --mc --eventcontent MINIAODSIM --datatier MINIAODSIM --conditions 124X_mcRun3_2022_realistic_postEE_v1 --step PAT --nThreads 2 --geometry  DB:Extended --era Run3  --filein file:input.root --fileout file:output.root -n -1  --no_exec
+
+
 
 Condor Jobs
 ===========
