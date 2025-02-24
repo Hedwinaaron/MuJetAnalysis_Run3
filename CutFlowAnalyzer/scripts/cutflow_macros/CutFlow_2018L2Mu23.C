@@ -1387,7 +1387,7 @@ void efficiency(const std::vector<std::string>& dirNames)
                    (massC > 0.2113 && massC < 9 && massF > 0.2113 && massF < 9) ) {
                 counter[k][13]++;
 
-                if ( diMuonC_IsoTk_FittedVtx < 2.3 && diMuonF_IsoTk_FittedVtx < 2.3 ) {
+                if ( diMuonC_IsoTk_FittedVtx >= 0 && diMuonC_IsoTk_FittedVtx < 2.3 &&  diMuonF_IsoTk_FittedVtx >=0 && diMuonF_IsoTk_FittedVtx < 2.3 ) {
                   counter[k][14]++;
 
                   if ( isSignalHLTFired ) {
